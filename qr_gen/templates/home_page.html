@@ -1,4 +1,9 @@
 {% extends '_layout.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/home_page.css' %}">
+{% endblock %}
 
 {% block content %}
     <main>
@@ -194,15 +199,6 @@
 
                     <div class="feature-card">
                         <div class="feature-icon">
-                            <i class="fas fa-download"></i>
-                        </div>
-                        <h3 class="feature-title">Multiple Formats</h3>
-                        <p class="feature-description">Download your QR codes in PNG, SVG, or JPG formats for use in
-                            print or digital applications.</p>
-                    </div>
-
-                    <div class="feature-card">
-                        <div class="feature-icon">
                             <i class="fas fa-shield-alt"></i>
                         </div>
                         <h3 class="feature-title">Error Correction</h3>
@@ -215,11 +211,15 @@
                             <i class="fas fa-expand"></i>
                         </div>
                         <h3 class="feature-title">Flexible Sizing</h3>
-                        <p class="feature-description">Generate QR codes in various sizes from 100x100 to 400x400 pixels
+                        <p class="feature-description">Generate QR codes in various sizes from 270x270 to 810x810 pixels
                             to fit any application.</p>
                     </div>
                 </div>
             </div>
         </section>
     </main>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/home_page.js' %}"></script>
 {% endblock %}

@@ -1,0 +1,99 @@
+{% extends '_layout.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/register_page.css' %}">
+{% endblock %}
+
+{% block content %}
+    <main>
+        <section class="auth-container">
+            <div class="auth-card">
+                <div class="auth-tabs">
+                    {% if register %}
+                    	<div class="auth-tab" id="loginTab">Login</div>
+                        <div class="auth-tab active" id="signupTab">Sign Up</div>
+                    {% else %}
+                        <div class="auth-tab active" id="loginTab">Login</div>
+                        <div class="auth-tab" id="signupTab">Sign Up</div>
+                    {% endif %}
+
+                </div>
+
+                <div class="auth-content">
+                    <!-- Login Form -->
+                    <form class="auth-form {% if not register %} active {% endif %}" id="loginForm" method="post" action="{% url 'qr-gen' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="loginEmail">Email Address</label>
+                            <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                        </div>
+                        <div class="form-footer">
+                            <div class="remember-me">
+                                <input type="checkbox" id="rememberMe">
+                                <label for="rememberMe">Remember me</label>
+                            </div>
+                            <a href="#" class="forgot-password">Forgot password?</a>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <span id="loginBtnText">Login</span>
+                        </button>
+
+                        <div class="auth-switch">
+                            Don't have an account? <a href="#" id="switchToSignup">Sign up</a>
+                        </div>
+                    </form>
+
+                    <!-- Signup Form -->
+                    <form class="auth-form {% if register %} active {% endif %}" id="signupForm" method="post" action="{% url 'register' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="signupName">Full Name</label>
+                            {{ form.nickname }}
+                            {% if form.nickname.errors %}
+                                <div class="error-message">{{ form.nickname.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="signupEmail">Email Address</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="error-message">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="error-message">{{ form.password.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="signupConfirmPassword">Confirm Password</label>
+                            {{ form.re_password }}
+                            {% if form.re_password.errors %}
+                                <div class="error-message">{{ form.re_password.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Create Account
+                        </button>
+
+                        <div class="auth-switch">
+                            Already have an account? <a href="#" id="switchToLogin">Login</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/register_page.js' %}"></script>
+{% endblock %}
