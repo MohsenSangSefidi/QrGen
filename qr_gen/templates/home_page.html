@@ -1,0 +1,225 @@
+{% extends '_layout.html' %}
+
+{% block content %}
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Generate QR Codes in Seconds</h1>
+                <p>Create custom QR codes for URLs, text, contact information, and more. Free, fast, and easy to
+                    use.</p>
+                <a href="{% url 'qr-gen' %}" class="btn btn-primary">Generate QR Code</a>
+            </div>
+        </section>
+
+        <section id="generator" class="generator">
+            <div class="container">
+                <div class="generator-container">
+                    {% if not created %}
+                        <div class="generator-header">
+                            <h2>QR Code Generator</h2>
+                            <p>Fill in the details below to create your custom QR code</p>
+                        </div>
+                        <form class="generator-form" id="qrForm" method="post" action="" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="qrUrl">URL to encode</label>
+                                <input type="url" id="qrUrl" name="url" class="form-control"
+                                       placeholder="https://example.com" required>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="qrSize">Size</label>
+                                    <select id="qrSize" name="size" class="form-control">
+                                        <option value="10">270x270</option>
+                                        <option value="20">540x540</option>
+                                        <option value="30" selected>810x810</option>
+
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="qrErrorCorrection">Error Correction Level</label>
+                                    <select id="qrErrorCorrection" name="error_correction" class="form-control">
+                                        <option value="ERROR_CORRECT_L">Low (7%)</option>
+                                        <option value="ERROR_CORRECT_M">Medium (15%)</option>
+                                        <option value="ERROR_CORRECT_Q" selected>Quartile (25%)</option>
+                                        <option value="ERROR_CORRECT_H">High (30%)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>QR Code Style</label>
+                                <div class="styles-grid" id="stylesGrid">
+                                    <!-- Style options will be populated by JavaScript -->
+                                </div>
+                                <input type="hidden" id="style-input" name="style" value="classic">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Color Type</label>
+                                <div class="color-options">
+                                    <div class="color-option">
+                                        <input type="radio" id="solidColor" name="color_type" value="solid" checked>
+                                        <label for="solidColor">Solid Color</label>
+                                    </div>
+                                    <div class="color-option">
+                                        <input type="radio" id="gradientColor" name="color_type" value="gradient">
+                                        <label for="gradientColor">Gradient Color</label>
+                                    </div>
+                                </div>
+
+                                <div id="solidColorControls" class="solid-controls">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="qrColor">QR Code Color</label>
+                                            <div class="color-picker">
+                                                <input type="color" id="qrColor" name="color" value="#000000">
+                                                <input type="text" id="qrColorText" class="form-control" value="#000000"
+                                                       readonly>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="qrBgColor">Background Color</label>
+                                            <div class="color-picker">
+                                                <input type="color" id="qrBgColor" name="bg_color" value="#ffffff">
+                                                <input type="text" id="qrBgColorText" class="form-control"
+                                                       value="#ffffff" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="gradientColorControls" class="gradient-controls">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="gradientStart">Gradient Start Color</label>
+                                            <div class="color-picker">
+                                                <input type="color" id="gradientStart" name="gradient_start"
+                                                       value="#4361ee">
+                                                <input type="text" id="gradientStartText" class="form-control"
+                                                       value="#4361ee"
+                                                       readonly>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="gradientEnd">Gradient End Color</label>
+                                            <div class="color-picker">
+                                                <input type="color" id="gradientEnd" name="gradient_end"
+                                                       value="#3a0ca3">
+                                                <input type="text" id="gradientEndText" class="form-control"
+                                                       value="#3a0ca3"
+                                                       readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="gradientDirection">Gradient Direction</label>
+                                        <select id="gradientDirection" name="gradient_direction" class="form-control">
+                                            <option value="radial">Radial</option>
+                                            <option value="square">Square</option>
+                                            <option value="horizontal">Horizontal</option>
+                                            <option value="vertical">Vertical</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Logo (Optional)</label>
+                                <div class="file-upload">
+                                    <div class="file-upload-btn">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p>Click to upload a logo or drag and drop</p>
+                                        <p>PNG, JPG up to 5MB</p>
+                                    </div>
+                                    <input type="file" id="logoUpload" name="logo" accept="image/png">
+                                </div>
+                                <div class="file-name" id="fileName">No file chosen</div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <span id="btnText">Generate QR Code</span>
+                            </button>
+                        </form>
+                    {% else %}
+                        <h1 style="text-align: center">Your Qr Code Is Ready</h1>
+                        <div class="qr-result" id="qrResult">
+                            <div id="qrcode">
+                                <img src="{{ image_url }}" alt="qrcode">
+                            </div>
+                            <div class="download-options">
+                                <a href="{{ image_url }}" class="btn btn-outline" id="downloadPNG" download>Download PNG</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Powerful Features</h2>
+                    <p>Discover all the amazing features that make QRGen Pro the best QR code generator</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-paint-brush"></i>
+                        </div>
+                        <h3 class="feature-title">Custom Styling</h3>
+                        <p class="feature-description">Choose from multiple QR code styles including classic, gradient,
+                            rounded, and pattern designs to match your brand.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <h3 class="feature-title">Color Customization</h3>
+                        <p class="feature-description">Customize your QR code with solid colors or beautiful gradients.
+                            Change both code and background colors.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <h3 class="feature-title">Logo Integration</h3>
+                        <p class="feature-description">Add your company logo to the center of the QR code for brand
+                            recognition and professional appearance.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <h3 class="feature-title">Multiple Formats</h3>
+                        <p class="feature-description">Download your QR codes in PNG, SVG, or JPG formats for use in
+                            print or digital applications.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="feature-title">Error Correction</h3>
+                        <p class="feature-description">Adjust error correction levels to ensure your QR codes remain
+                            scannable even when partially damaged.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-expand"></i>
+                        </div>
+                        <h3 class="feature-title">Flexible Sizing</h3>
+                        <p class="feature-description">Generate QR codes in various sizes from 100x100 to 400x400 pixels
+                            to fit any application.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock %}
