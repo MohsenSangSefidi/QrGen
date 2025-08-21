@@ -6,12 +6,13 @@
                 <span>QRGen Pro</span>
             </a>
             <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#how-it-works">How It Works</a>
-                <a href="#pricing">Pricing</a>
-                <a href="#contact">Contact</a>
+                <a href="{% url 'qr-gen' %}">QR-Gen</a>
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="#pricing">Api Documentation</a>
             </div>
-            <a href="{% url 'register' %}" class="btn btn-outline">Login / SingUp</a>
+            {% if not request.user.is_authenticated %}
+                <a href="{% url 'register' %}" class="btn btn-outline">Login / SingUp</a>
+            {% endif %}
         </nav>
     </div>
 </header>

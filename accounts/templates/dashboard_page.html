@@ -1,0 +1,369 @@
+{% extends '_layout.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/dashboard_page.css' %}">
+{% endblock %}
+
+{% block content %}
+    <main class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>User Dashboard</h1>
+                <div>
+                    <span>Welcome back, </span>
+                    <strong>Sarah Johnson</strong>
+                </div>
+            </div>
+
+            <div class="dashboard-tabs">
+                <div class="dashboard-tab active" data-tab="profile">Profile</div>
+                <div class="dashboard-tab" data-tab="api">API Settings</div>
+                <div class="dashboard-tab" data-tab="history">QR History</div>
+                <div class="dashboard-tab" data-tab="billing">Billing</div>
+            </div>
+
+            <div class="dashboard-content">
+                <!-- Profile Tab -->
+                <div class="tab-content active" id="profile-tab">
+                    <div class="profile-info">
+                        <div>
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile"
+                                 class="profile-avatar">
+                            <button class="btn btn-outline" style="margin-top: 15px; width: 100%;">
+                                <i class="fas fa-camera"></i> Change Photo
+                            </button>
+                        </div>
+                        <div class="profile-details">
+                            <h2>Profile Information</h2>
+                            <form id="profileForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="firstName">First Name</label>
+                                        <input type="text" id="firstName" class="form-control" value="Sarah" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lastName">Last Name</label>
+                                        <input type="text" id="lastName" class="form-control" value="Johnson" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" id="email" class="form-control"
+                                           value="sarah.johnson@example.com"
+                                           required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="company">Company</label>
+                                    <input type="text" id="company" class="form-control" value="Tech Solutions Inc.">
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" id="phone" class="form-control" value="+1 (555) 123-4567">
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <span id="saveProfileText">Save Changes</span>
+                                    <div class="spinner" id="profileSpinner"></div>
+                                </button>
+                            </form>
+
+                            <div style="margin-top: 40px;">
+                                <h3>Change Password</h3>
+                                <form id="passwordForm" style="margin-top: 15px;">
+                                    <div class="form-group">
+                                        <label for="currentPassword">Current Password</label>
+                                        <input type="password" id="currentPassword" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="newPassword">New Password</label>
+                                        <input type="password" id="newPassword" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="confirmPassword">Confirm New Password</label>
+                                        <input type="password" id="confirmPassword" class="form-control" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <span id="savePasswordText">Update Password</span>
+                                        <div class="spinner" id="passwordSpinner"></div>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Settings Tab -->
+                <div class="tab-content" id="api-tab">
+                    <h2>API Settings</h2>
+                    <p style="margin-bottom: 20px;">Manage your API keys and integration settings</p>
+
+                    <div class="api-stats">
+                        <div class="stat-card">
+                            <div class="stat-value">1,248</div>
+                            <div class="stat-label">API Calls (30 days)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">89%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">Pro</div>
+                            <div class="stat-label">Plan Level</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Your API Key</label>
+                        <div class="api-key-container">
+                            <code class="api-key">qrgp_sk_live_1234567890abcdefghijklmnopqrstuvwxyz</code>
+                            <button class="btn btn-outline" id="copyApiKey">
+                                <i class="far fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <small class="text-muted">Keep this key secret. Do not share it publicly.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="apiRateLimit">Rate Limit</label>
+                        <select id="apiRateLimit" class="form-control">
+                            <option value="10">10 requests/second</option>
+                            <option value="25" selected>25 requests/second</option>
+                            <option value="50">50 requests/second</option>
+                            <option value="100">100 requests/second</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="apiWebhook">Webhook URL</label>
+                        <input type="url" id="apiWebhook" class="form-control"
+                               placeholder="https://example.com/webhook">
+                    </div>
+
+                    <div class="form-group">
+                        <div class="remember-me">
+                            <input type="checkbox" id="enableAnalytics" checked>
+                            <label for="enableAnalytics">Enable usage analytics</label>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="saveApiSettings">
+                        <span id="saveApiText">Save API Settings</span>
+                        <div class="spinner" id="apiSpinner"></div>
+                    </button>
+
+                    <div style="margin-top: 40px;">
+                        <h3>Danger Zone</h3>
+                        <div style="margin-top: 15px; padding: 20px; border: 1px solid #ffebee; border-radius: 5px; background-color: #fff5f5;">
+                            <div style="margin-bottom: 15px;">
+                                <strong>Regenerate API Key</strong>
+                                <p style="margin-top: 5px; color: var(--gray);">This will invalidate your current API
+                                    key
+                                    and generate a new one.</p>
+                            </div>
+                            <button class="btn btn-outline" id="regenerateApiKey">
+                                <i class="fas fa-sync-alt"></i> Regenerate Key
+                            </button>
+
+                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ffebee;">
+                                <strong>Disable API Access</strong>
+                                <p style="margin-top: 5px; color: var(--gray);">Temporarily disable all API access for
+                                    your
+                                    account.</p>
+                                <button class="btn btn-danger" id="disableApi" style="margin-top: 10px;">
+                                    <i class="fas fa-power-off"></i> Disable API
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QR History Tab -->
+                <div class="tab-content" id="history-tab">
+                    <h2>Your QR Code History</h2>
+                    <p style="margin-bottom: 20px;">View and manage your previously generated QR codes</p>
+
+                    <div class="qr-history">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3>Recent QR Codes</h3>
+                            <div>
+                                <input type="text" placeholder="Search QR codes..." class="form-control"
+                                       style="display: inline-block; width: auto;">
+                            </div>
+                        </div>
+
+                        <div class="qr-grid">
+                            <!-- Sample QR items - these would be dynamically generated in a real app -->
+                            <div class="qr-item">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/product1"
+                                     alt="QR Code" class="qr-image">
+                                <div class="qr-title">Product Page</div>
+                                <div class="qr-date">May 15, 2023</div>
+                            </div>
+                            <div class="qr-item">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/event"
+                                     alt="QR Code" class="qr-image">
+                                <div class="qr-title">Event Registration</div>
+                                <div class="qr-date">May 10, 2023</div>
+                            </div>
+                            <div class="qr-item">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/contact"
+                                     alt="QR Code" class="qr-image">
+                                <div class="qr-title">Contact Info</div>
+                                <div class="qr-date">May 5, 2023</div>
+                            </div>
+                            <div class="qr-item">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/discount"
+                                     alt="QR Code" class="qr-image">
+                                <div class="qr-title">Discount Code</div>
+                                <div class="qr-date">Apr 28, 2023</div>
+                            </div>
+                            <div class="qr-item">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/feedback"
+                                     alt="QR Code" class="qr-image">
+                                <div class="qr-title">Feedback Form</div>
+                                <div class="qr-date">Apr 20, 2023</div>
+                            </div>
+                            <div class="qr-item">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/wifi"
+                                     alt="QR Code" class="qr-image">
+                                <div class="qr-title">WiFi Access</div>
+                                <div class="qr-date">Apr 15, 2023</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 30px; text-align: center;">
+                            <button class="btn btn-outline">
+                                <i class="fas fa-history"></i> Load More
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing Tab -->
+                <div class="tab-content" id="billing-tab">
+                    <h2>Billing Information</h2>
+                    <p style="margin-bottom: 20px;">Manage your subscription and payment methods</p>
+
+                    <div style="background-color: white; border-radius: 5px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); padding: 20px; margin-bottom: 30px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <div>
+                                <h3 style="margin-bottom: 5px;">Pro Plan</h3>
+                                <p style="color: var(--gray);">$19.99/month</p>
+                            </div>
+                            <span style="background-color: #e6f7ff; color: var(--primary); padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Active</span>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <p><strong>Next Billing Date:</strong> June 15, 2023</p>
+                            <p><strong>Payment Method:</strong> Visa ending in 4242</p>
+                        </div>
+
+                        <div style="margin-top: 20px; display: flex; gap: 10px;">
+                            <button class="btn btn-outline">
+                                <i class="fas fa-credit-card"></i> Update Payment Method
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-file-invoice"></i> View Invoices
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px;">
+                        <h3>Change Plan</h3>
+                        <div style="margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                            <div style="background-color: white; border-radius: 5px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); padding: 20px; text-align: center; border: 2px solid #eee;">
+                                <h4 style="margin-bottom: 10px;">Basic</h4>
+                                <p style="font-size: 1.5rem; font-weight: 700; margin-bottom: 10px;">$9.99<span
+                                        style="font-size: 0.9rem; color: var(--gray);">/month</span></p>
+                                <ul style="text-align: left; margin-bottom: 20px; list-style: none;">
+                                    <li style="margin-bottom: 8px;"><i class="fas fa-check"
+                                                                       style="color: var(--success); margin-right: 5px;"></i>
+                                        100 QR codes/month
+                                    </li>
+                                    <li style="margin-bottom: 8px;"><i class="fas fa-check"
+                                                                       style="color: var(--success); margin-right: 5px;"></i>
+                                        Basic analytics
+                                    </li>
+                                    <li style="margin-bottom: 8px;"><i class="fas fa-check"
+                                                                       style="color: var(--success); margin-right: 5px;"></i>
+                                        PNG downloads
+                                    </li>
+                                    <li style="color: var(--gray);"><i class="fas fa-times"
+                                                                       style="margin-right: 5px;"></i>
+                                        No API access
+                                    </li>
+                                </ul>
+                                <button class="btn btn-outline" style="width: 100%;">Select Plan</button>
+                            </div>
+                            <div style="background-color: white; border-radius: 5px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); padding: 20px; text-align: center; border: 2px solid var(--primary); position: relative;">
+                                <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background-color: var(--primary); color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem;">
+                                    Current Plan
+                                </div>
+                                <h4 style="margin-bottom: 10px;">Pro</h4>
+                                <p style="font-size: 1.5rem; font-weight: 700; margin-bottom: 10px;">$19.99<span
+                                        style="font-size: 0.9rem; color: var(--gray);">/month</span></p>
+                                <ul style="text-align: left; margin-bottom: 20px; list-style: none;">
+                                    <li style="margin-bottom: 8px;"><i class="fas fa-check"
+                                                                       style="color: var(--success); margin-right: 5px;"></i>
+                                        Unlimited QR codes
+                                    </li>
+                                    <li style="margin-bottom: 8px;"><i class="fas fa-check"
+                                                                       style="color: var(--success); margin-right: 5px;"></i>
+                                        Advanced analytics
+                                    </li>
+                                    <li style="margin-bottom: 8px;"><i class="fas fa-check"
+                                                                       style="color: var(--success); margin-right: 5px;"></i>
+                                        All download formats
+                                    </li>
+                                    <li style="margin-bottom: 8px;"><i class="fas fa-check"
+                                                                       style="color: var(--success); margin-right: 5px;"></i>
+                                        API access
+                                    </li>
+                                </ul>
+                                <button class="btn btn-primary" style="width: 100%;" disabled>Current Plan</button>
+                            </div>
+                            <div style="background-color: white; border-radius: 5px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); padding: 20px; text-align: center; border: 2px solid #eee;">
+                                <h4 style="margin-bottom: 10px;">Enterprise</h4>
+                                <p style="font-size: 1.5rem; font-weight: 700; margin-bottom: 10px;">$49.99<span
+                                        style="font-size: 0.9rem; color: var(--gray);">/month</span></p>
+                                <ul style="text-align: left; margin-bottom: 20px; list-style: none;">
+                                    <li style="margin-bottom: 8px;"><i class="fas fa-check"
+                                                                       style="color: var(--success); margin-right: 5px;"></i>
+                                        Unlimited QR codes
+                                    </li>
+                                    <li style="margin-bottom: 8px;"><i class="fas fa-check"
+                                                                       style="color: var(--success); margin-right: 5px;"></i>
+                                        Premium analytics
+                                    </li>
+                                    <li style="margin-bottom: 8px;"><i class="fas fa-check"
+                                                                       style="color: var(--success); margin-right: 5px;"></i>
+                                        All download formats
+                                    </li>
+                                    <li style="margin-bottom: 8px;"><i class="fas fa-check"
+                                                                       style="color: var(--success); margin-right: 5px;"></i>
+                                        Priority API access
+                                    </li>
+                                </ul>
+                                <button class="btn btn-outline" style="width: 100%;">Select Plan</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px; padding: 20px; border: 1px solid #ffebee; border-radius: 5px; background-color: #fff5f5;">
+                        <h3 style="color: var(--danger);">Cancel Subscription</h3>
+                        <p style="margin-top: 5px; margin-bottom: 15px;">Your subscription will remain active until the
+                            end
+                            of the current billing period.</p>
+                        <button class="btn btn-danger" id="cancelSubscription">
+                            <i class="fas fa-times"></i> Cancel Subscription
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/dashboard_page.js' %}"></script>
+{% endblock %}

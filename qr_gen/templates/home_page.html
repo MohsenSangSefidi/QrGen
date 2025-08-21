@@ -10,9 +10,7 @@
         <section class="hero">
             <div class="container">
                 <h1>Generate QR Codes in Seconds</h1>
-                <p>Create custom QR codes for URLs, text, contact information, and more. Free, fast, and easy to
-                    use.</p>
-                <a href="{% url 'qr-gen' %}" class="btn btn-primary">Generate QR Code</a>
+                <p>Create custom QR codes for URLs. Free, fast, and easy to use.</p>
             </div>
         </section>
 
@@ -155,6 +153,8 @@
                             </div>
                             <div class="download-options">
                                 <a href="{{ image_url }}" class="btn btn-outline" id="downloadPNG" download>Download PNG</a>
+                                <a href="{% url 'qr-gen' %}" class="btn btn-primary">Generate Another</a>
+                                <a href="{% url 'qr-gen' %}" class="btn btn-primary">Save To Favorite</a>
                             </div>
                         </div>
                     {% endif %}

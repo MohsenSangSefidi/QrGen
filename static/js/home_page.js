@@ -102,30 +102,6 @@ document.addEventListener('DOMContentLoaded', function () {
         stylesGrid.firstChild.classList.add('selected');
     }
 
-    // Toast notification
-    function showToast(message, type) {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.className = 'toast show';
-
-        // Set background color based on type
-        switch (type) {
-            case 'success':
-                toast.style.backgroundColor = '#4cc9f0';
-                break;
-            case 'error':
-                toast.style.backgroundColor = '#f72585';
-                break;
-            default:
-                toast.style.backgroundColor = '#1a1a2e';
-        }
-
-        // Hide after 3 seconds
-        setTimeout(function () {
-            toast.className = 'toast';
-        }, 3000);
-    }
-
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {

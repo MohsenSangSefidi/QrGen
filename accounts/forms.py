@@ -93,3 +93,30 @@ class RegisterForm(forms.ModelForm):
             user.save()
 
         return user
+
+
+class LoginForm(forms.Form):
+    email = forms.EmailField(
+        widget=forms.EmailInput(
+            attrs={
+                'type': "email",
+                'id': "loginEmail",
+                'class': "form-control",
+                'placeholder': "Enter your email"
+            }
+        ), label=''
+    )
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'type': "password",
+                'id': "loginPassword",
+                'class': "form-control",
+                'placeholder': "Enter your password"
+            }
+        )
+    )
+
+    class Meta:
+        fields = ("email", "password")
