@@ -1,9 +1,23 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, reverse
-from django.contrib.auth import login
+from django.utils.crypto import get_random_string
+from django.contrib.auth import login, logout
+from django.utils.decorators import method_decorator
+
+from utils.email_utils import send_email
 from urllib.parse import urlencode
+from django.utils import timezone
+from django.conf import settings
 from django.views import View
 
-from .forms import RegisterForm, LoginForm
+from .forms import (
+    RegisterForm,
+    LoginForm,
+    ChangeUserInfoForm,
+    ChangePasswordForm,
+    SendEmailForm,
+    RestPasswordForm,
+)
 
 from .models import UserModel
 
@@ -13,19 +27,20 @@ class RegisterView(View):
         register_form = RegisterForm()
         login_form = LoginForm()
 
-        error = request.GET.get('error')
-        massage = request.GET.get('massage')
-        created = request.GET.get('created')
+        error = request.GET.get("error")
+        message = request.GET.get("message")
+        created = request.GET.get("created")
 
         return render(
-            request, "register_page.html",
+            request,
+            "register_page.html",
             {
                 "register_form": register_form,
-                'login_form': login_form,
-                'error': error,
-                'massage': massage,
-                'created': created,
-            }
+                "login_form": login_form,
+                "error": error,
+                "message": message,
+                "created": created,
+            },
         )
 
     def post(self, request, *args, **kwargs):
@@ -35,12 +50,13 @@ class RegisterView(View):
         # Validate Data
         if not register_form.is_valid():
             return render(
-                request, "register_page.html",
+                request,
+                "register_page.html",
                 {
                     "register_form": register_form,
-                    'login_form': login_form,
-                    "register": True
-                }
+                    "login_form": login_form,
+                    "register": True,
+                },
             )
 
         # Save
@@ -60,7 +76,7 @@ class LoginView(View):
 
         if not form.is_valid():
             base_url = reverse("register")
-            params = {"error": True, 'massage': 'Invalid Email Address'}
+            params = {"error": True, "message": "Invalid Email Address"}
             query_string = urlencode(params)
 
             return redirect(f"{base_url}?{query_string}")
@@ -73,14 +89,14 @@ class LoginView(View):
             user = UserModel.objects.get(email=email)
         except UserModel.DoesNotExist:
             base_url = reverse("register")
-            params = {"error": True, 'massage': 'Account does not exist'}
+            params = {"error": True, "message": "Account does not exist"}
             query_string = urlencode(params)
 
             return redirect(f"{base_url}?{query_string}")
 
         if not user.check_password(password):
             base_url = reverse("register")
-            params = {"error": True, 'massage': 'Password Incorrect'}
+            params = {"error": True, "message": "Password Incorrect"}
             query_string = urlencode(params)
 
             return redirect(f"{base_url}?{query_string}")
@@ -90,8 +106,215 @@ class LoginView(View):
         return redirect(reverse("qr-gen"))
 
 
+@method_decorator(login_required, name="dispatch")
 class DashboardView(View):
     def get(self, request, *args, **kwargs):
+        change_info_form = ChangeUserInfoForm(instance=request.user)
+        password_form = ChangePasswordForm()
+
+        # User Data
+        api_key = request.user.api_key
+
+        # Query Params
+        password_success = request.GET.get("password_success")
+        info_success = request.GET.get("info_success")
+        message = request.GET.get("message")
+        info_error = request.GET.get("info_error")
+        password_error = request.GET.get("password_error")
+        error = request.GET.get("error")
+
         return render(
-            request, 'dashboard_page.html'
+            request,
+            "dashboard_page.html",
+            {
+                "change_info_form": change_info_form,
+                "password_form": password_form,
+                "password_success": password_success,
+                "info_success": info_success,
+                "message": message,
+                "info_error": info_error,
+                "password_error": password_error,
+                "error": error,
+                "api_key": api_key,
+            },
         )
+
+
+@method_decorator(login_required, name="dispatch")
+class ChangeInfoView(View):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        form = ChangeUserInfoForm(request.POST, instance=user)
+
+        if not form.is_valid():
+            # Return result with query params
+            base_url = reverse("dashboard")
+            params = {"info_error": True}
+            query_string = urlencode(params)
+
+            return redirect(f"{base_url}?{query_string}")
+
+        form.save()
+
+        base_url = reverse("dashboard")
+        params = {"info_success": True, "message": "Info Changed Successfully!"}
+        query_string = urlencode(params)
+
+        return redirect(f"{base_url}?{query_string}")
+
+
+@method_decorator(login_required, name="dispatch")
+class ChangePasswordView(View):
+    def post(self, request, *args, **kwargs):
+        form = ChangePasswordForm(request.POST)
+
+        if not form.is_valid():
+            base_url = reverse("dashboard")
+            params = {
+                "password_error": True,
+                "error": "Password must be at least 8 characters long.",
+            }
+            query_string = urlencode(params)
+
+            return redirect(f"{base_url}?{query_string}")
+
+        # Data
+        user = request.user
+        current_password = form.cleaned_data.get("current_password")
+        new_password = form.cleaned_data.get("new_password")
+        confirm_password = form.cleaned_data.get("confirm_password")
+
+        if new_password != confirm_password:
+            base_url = reverse("dashboard")
+            params = {
+                "password_error": True,
+                "error": "New Password and Confirm Password do not match.",
+            }
+            query_string = urlencode(params)
+
+            return redirect(f"{base_url}?{query_string}")
+
+        if not user.check_password(current_password):
+            base_url = reverse("dashboard")
+            params = {
+                "password_error": True,
+                "error": "Current Password does not match.",
+            }
+            query_string = urlencode(params)
+
+            return redirect(f"{base_url}?{query_string}")
+
+        user.set_password(new_password)
+        user.save()
+
+        login(request, user)
+
+        base_url = reverse("dashboard")
+        params = {"password_success": True, "message": "Password Changed Successfully!"}
+        query_string = urlencode(params)
+
+        return redirect(f"{base_url}?{query_string}")
+
+
+class SendEmailView(View):
+    def get(self, request, *args, **kwargs):
+        form = SendEmailForm()
+
+        return render(
+            request,
+            "send_email_page.html",
+            {
+                "form": form,
+            },
+        )
+
+    def post(self, request, *args, **kwargs):
+        form = SendEmailForm(request.POST)
+
+        if not form.is_valid():
+            return render(
+                request,
+                "send_email_page.html",
+                {
+                    "form": form,
+                },
+            )
+
+        email = form.cleaned_data.get("email")
+
+        try:
+            user = UserModel.objects.get(email=email)
+        except UserModel.DoesNotExist:
+            form.add_error("email", "Email Does Not Exist!")
+            return render(
+                request,
+                "send_email_page.html",
+                {
+                    "form": form,
+                },
+            )
+
+        # Change user token
+        user.token = get_random_string(length=100)
+        user.token_active_date = timezone.datetime.now() + timezone.timedelta(days=1)
+        user.save()
+
+        # Send mail
+        link = settings.DEFAULT_DOMAIN + reverse("reset-password", args=[user.token])
+        # send_email({"user": user, "link": link}, user.email)
+
+        return render(
+            request,
+            "send_email_page.html",
+            {"form": form, "success": True},
+        )
+
+
+class RestPasswordView(View):
+    def get(self, request, token, *args, **kwargs):
+        form = RestPasswordForm()
+
+        user = UserModel.objects.get(token=token)
+
+        if user.token_active_date < timezone.now():
+            return redirect("register")
+
+        return render(
+            request,
+            "reset_password_page.html",
+            {
+                "form": form,
+            },
+        )
+
+    def post(self, request, token, *args, **kwargs):
+        form = RestPasswordForm(request.POST)
+
+        if not form.is_valid():
+            return render(
+                request,
+                "reset_password_page.html",
+                {
+                    "form": form,
+                },
+            )
+
+        try:
+            user = UserModel.objects.get(token=token)
+        except UserModel.DoesNotExist:
+            return redirect(reverse("register"))
+
+        user.set_password(form.cleaned_data.get("new_password"))
+        user.save()
+
+        login(request, user)
+
+        return redirect(reverse("dashboard"))
+
+
+@method_decorator(login_required, name="dispatch")
+def logout_view(request):
+    logout(request)
+
+    return redirect(reverse("qr-gen"))

@@ -1,0 +1,64 @@
+{% extends '_layout.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/send_email_page.css' %}">
+{% endblock %}
+
+{% block content %}
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Reset Your Password</h1>
+                <p>Enter your email address and we'll send you instructions to reset your password.</p>
+            </div>
+        </section>
+
+        <section class="auth-section">
+            <div class="container">
+                <div class="auth-container">
+                    <div class="auth-header">
+                        <h2>Forgot Password</h2>
+                        <p>Please enter your account email address</p>
+                    </div>
+
+                    <form class="auth-form" id="resetForm" method="post" action="">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="error-message" style="color: #db4437!important;">{{ form.email.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">We'll send a password reset link to this email</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <span id="btnText">Send Reset Instructions</span>
+                            <div class="spinner" id="spinner"></div>
+                        </button>
+                    </form>
+
+                    {% if success %}
+                    	<div class="success-message" id="successMessage">
+                            <div class="success-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3>Check Your Email</h3>
+                            <p>We've sent password reset instructions to your email address.</p>
+                            <p class="form-text">Didn't receive the email? Check your spam folder</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="auth-footer">
+                        <p>Remember your password? <a href="{% url 'register' %}">Back to Login</a></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock %}
+
+{% block js %}
+
+{% endblock %}

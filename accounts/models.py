@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.crypto import get_random_string
+from django.utils import timezone
+from django.db import models
 
 
 class CustomUserManager(BaseUserManager):
@@ -38,6 +40,15 @@ class UserModel(AbstractUser):
     username = None
     nickname = models.CharField(_("Nickname"), max_length=150)
     email = models.EmailField(_("Email"), unique=True)
+    api_key = models.CharField(
+        _("API Key"), max_length=100, unique=True, default=get_random_string(length=100)
+    )
+    token = models.CharField(
+        _("Token"), max_length=100, unique=True, default=get_random_string(length=100)
+    )
+    token_active_date = models.DateTimeField(
+        _("Token Active Date"), default=timezone.now
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

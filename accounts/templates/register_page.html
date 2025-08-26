@@ -26,7 +26,7 @@
                         {% csrf_token %}
                         <div class="form-group">
                             {% if created %}
-                                <div class="error-message" style="color: #3a56d4!important;">Account Created Successfully!</div>
+                                <div class="success-message" >Account Created Successfully!</div>
                             {% endif %}
                             {% if error %}
                                 <div class="error-message">{{ message }}</div>
@@ -39,7 +39,7 @@
                             {{ login_form.password }}
                         </div>
                         <div class="form-footer">
-                            <a href="#" class="forgot-password">Forgot password?</a>
+                            <a href="{% url 'send-email' %}" class="forgot-password">Forgot password?</a>
                         </div>
                         <button type="submit" class="btn btn-primary">
                             Login
