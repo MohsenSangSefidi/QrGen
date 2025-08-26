@@ -115,10 +115,6 @@
                     <div class="qr-history">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                             <h3>Recent QR Codes</h3>
-                            <div>
-                                <input type="text" placeholder="Search QR codes..." class="form-control"
-                                       style="display: inline-block; width: auto;">
-                            </div>
                         </div>
 
                         <div class="qr-grid">
@@ -127,6 +123,7 @@
                                 <div class="qr-item">
                                     <img src="{{ qrcode.qrcode }}" alt="QR Code" class="qr-image">
                                     <div class="qr-date">{{ qrcode.created_at }}</div>
+                                    <a href="{{ qrcode.qrcode }}" class="btn btn-outline" id="downloadPNG" style="margin-top: 5px;" download>Download</a>
                                 </div>
                             {% endfor %}
                         </div>
