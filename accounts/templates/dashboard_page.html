@@ -123,43 +123,20 @@
 
                         <div class="qr-grid">
                             <!-- Sample QR items - these would be dynamically generated in a real app -->
-                            <div class="qr-item">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/product1"
-                                     alt="QR Code" class="qr-image">
-                                <div class="qr-date">May 15, 2023</div>
-                            </div>
-                            <div class="qr-item">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/event"
-                                     alt="QR Code" class="qr-image">
-                                <div class="qr-date">May 10, 2023</div>
-                            </div>
-                            <div class="qr-item">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/contact"
-                                     alt="QR Code" class="qr-image">
-                                <div class="qr-date">May 5, 2023</div>
-                            </div>
-                            <div class="qr-item">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/discount"
-                                     alt="QR Code" class="qr-image">
-                                <div class="qr-date">Apr 28, 2023</div>
-                            </div>
-                            <div class="qr-item">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/feedback"
-                                     alt="QR Code" class="qr-image">
-                                <div class="qr-date">Apr 20, 2023</div>
-                            </div>
-                            <div class="qr-item">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/wifi"
-                                     alt="QR Code" class="qr-image">
-                                <div class="qr-date">Apr 15, 2023</div>
-                            </div>
+                            {% for qrcode in qrcodes %}
+                                <div class="qr-item">
+                                    <img src="{{ qrcode.qrcode }}" alt="QR Code" class="qr-image">
+                                    <div class="qr-date">{{ qrcode.created_at }}</div>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
             </div>
 
             <a href="{% url 'logout' %}">
-                <button type="submit" class="btn btn-danger" style="margin-top: 30px;width: 150px;height: 50px;font-size: 15px;">
+                <button type="submit" class="btn btn-danger"
+                        style="margin-top: 30px;width: 150px;height: 50px;font-size: 15px;">
                     <span id="savePasswordText">Logout</span>
                 </button>
             </a>

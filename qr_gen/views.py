@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from qrcode.image.styledpil import StyledPilImage
 from django.shortcuts import render, redirect
 from urllib.parse import urlencode
@@ -25,21 +27,33 @@ from qrcode.image.styles.colormasks import (
     VerticalGradiantColorMask,
 )
 
+from accounts.models import QrCodeModel
+
 
 class QrGenView(View):
     def get(self, request, *args, **kwargs):
-        # Page Status
+        # Query Params
+        # ( For showing download box useing query params )
         created = request.GET.get("created")
         image_url = request.GET.get("image_url")
+        filename = request.GET.get("filename")
+        saved = request.GET.get("saved")
 
         return render(
-            request, "home_page.html", {"created": created, "image_url": image_url}
+            request,
+            "home_page.html",
+            {
+                "created": created,
+                "image_url": image_url,
+                "saved": saved,
+                "filename": filename,
+            },
         )
 
     def post(self, request, *args, **kwargs):
         data = request.POST
 
-        # Data
+        # Getting Data From Html Form
         url = request.POST.get("url")
         size = request.POST.get("size")
         error_correction = request.POST.get("error_correction")
@@ -52,7 +66,7 @@ class QrGenView(View):
         gradient_direction = request.POST.get("gradient_direction")
         logo = request.FILES.get("logo")
 
-        # Check Error-Correction
+        # Check Valua Error-Correction User Sent
         match error_correction:
             case "ERROR_CORRECT_L":
                 error_correction = qrcode.constants.ERROR_CORRECT_L
@@ -63,7 +77,7 @@ class QrGenView(View):
             case "ERROR_CORRECT_H":
                 error_correction = qrcode.constants.ERROR_CORRECT_H
 
-        # Create QrCode
+        # Create QrCode And Add Url
         qr = qrcode.QRCode(
             version=1,
             error_correction=error_correction,
@@ -89,7 +103,10 @@ class QrGenView(View):
             case "horizontal":
                 style_data["module_drawer"] = HorizontalBarsDrawer()
 
-        # Check Color Type
+        """
+            Check color type : first check wich type of color select and set suitable value for eche one,
+            If gradient selected it have a gradient_direction that needs to be checked
+        """
         match color_type:
             case "solid":
                 style_data["color_mask"] = SolidFillColorMask(
@@ -122,28 +139,30 @@ class QrGenView(View):
         # Create QrCode
         qr_image = qr.make_image(image_factory=StyledPilImage, **style_data)
 
-        # Save the image to media directory
-        media_path = os.path.join(settings.MEDIA_ROOT, "qrcodes")
+        # Media path for saving qrcode temporary
+        media_path = os.path.join(settings.MEDIA_ROOT, "temporary")
 
         # Create directory if it doesn't exist
         if not os.path.exists(media_path):
             os.makedirs(media_path)
 
-        # Generate unique filename
+        # Generate unique filename and path
         filename = f"qr_{uuid.uuid4().hex}.png"
         file_path = os.path.join(media_path, filename)
 
-        # Save the image
+        # Save the qrcode
         qr_image.save(file_path)
 
-        # Get the URL for the saved image
-        image_url = f"{settings.MEDIA_URL}qrcodes/{filename}"
+        # Qrcode url for showing on page and downloading
+        image_url = f"{settings.MEDIA_URL}temporary/{filename}"
 
+        # Set A Logo On Center of QrCode ( If logo sent )
         if logo is not None:
-            # Open images with Pillow
+            # Open Qrcode & Logo with Pillow
             background = Image.open(file_path).convert("RGBA")
             overlay = Image.open(logo).convert("RGBA")
 
+            # Resize Logo ( To avoid ruining the photo, Check QrCode Size And Set A Suitable Size For Logo )
             match size:
                 case "10":
                     resized_overlay = overlay.resize((90, 90), Image.Resampling.LANCZOS)
@@ -158,7 +177,7 @@ class QrGenView(View):
                 case _:
                     resized_overlay = overlay
 
-            # Calculate position to center the overlay image
+            # Calculate position to center the logo
             bg_width, bg_height = background.size
             ol_width, ol_height = resized_overlay.size
 
@@ -167,21 +186,57 @@ class QrGenView(View):
                 (bg_height - ol_height) // 2,  # y coordinate
             )
 
-            # Create a transparent layer for the overlay
+            # Create a transparent layer for the overlay. to remove the of logo
             transparent_overlay = Image.new("RGBA", background.size, (0, 0, 0, 0))
 
-            # Paste the overlay onto the transparent layer using the overlay's alpha channel as mask
+            # Paste the logo onto the transparent layer using the overlay's alpha channel as mask
             transparent_overlay.paste(resized_overlay, position, resized_overlay)
 
-            # Combine background with transparent overlay
-            result = Image.alpha_composite(background, transparent_overlay)
+            # Combine background with transparent logo
+            qr_image = Image.alpha_composite(background, transparent_overlay)
 
             # Save the image
-            result.save(file_path, format="PNG", quality=95)
+            qr_image.save(file_path, format="PNG", quality=95)
 
         # Return result with query params
         base_url = reverse("qr-gen")
-        params = {"created": True, "image_url": image_url}
+        params = {"created": True, "image_url": image_url, "filename": filename}
+        query_string = urlencode(params)
+
+        return redirect(f"{base_url}?{query_string}")
+
+
+@method_decorator(login_required, name="dispatch")
+class SaveQRCodeView(View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        # Get Data From Query Params
+        filename = request.GET.get("filename")
+        image_url = request.GET.get("image_url")
+
+        """
+            Move the qrcode to qr_code dir to avoid deleting that
+        """
+        # New Path For Move
+        new_path = os.path.join(settings.MEDIA_ROOT, "qr_codes")
+        new_file = os.path.join(new_path, filename)
+
+        # Orginal Path
+        old_path = os.path.join(settings.MEDIA_ROOT, "temporary")
+        old_file = os.path.join(old_path, filename)
+
+        # Move Qrcode
+        os.rename(old_file, new_file)
+
+        # New Url For Saving
+        new_url = f"{settings.MEDIA_URL}qr_codes/{filename}"
+
+        # Saving Qrcode
+        qr_code = QrCodeModel.objects.create(user=user, qrcode=new_url)
+
+        # Return To Home Page
+        base_url = reverse("qr-gen")
+        params = {"saved": True, "created": True, "image_url": new_url}
         query_string = urlencode(params)
 
         return redirect(f"{base_url}?{query_string}")

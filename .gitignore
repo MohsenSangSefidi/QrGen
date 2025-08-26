@@ -4,6 +4,10 @@ __pycache__/
 *$py.class
 .idea
 
+# Media
+media/qr_codes
+media/temporary
+
 # C extensions
 *.so
 
