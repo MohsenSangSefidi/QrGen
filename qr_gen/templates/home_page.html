@@ -148,12 +148,12 @@
                                     PNG</a>
                                 <a href="{% url 'qr-gen' %}" class="btn btn-outline">Generate Another</a>
                                 {% if not saved %}
-                                    <a href="{% url 'save-qrcode' %}?filename={{ filename }}&image_url={{ image_url }}"
-                                       class="btn btn-outline">Save To Favorite</a>
-                                {% else %}
                                     {% if request.user.is_authenticated %}
-                                        <a href="" class="btn btn-primary">QrCode Saved</a>
+                                        <a href="{% url 'save-qrcode' %}?filename={{ filename }}&image_url={{ image_url }}"
+                                           class="btn btn-outline">Save To Favorite</a>
                                     {% endif %} 
+                                {% else %}
+                                    <a href="" class="btn btn-primary">QrCode Saved</a>
                                 {% endif %}
                             </div>
                         </div>
