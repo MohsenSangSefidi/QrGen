@@ -243,5 +243,6 @@ class SaveQRCodeView(View):
 
 class ApiDocumentionView(View):
     def get(self, request):
+        domain = settings.DEFAULT_DOMAIN
 
-        return render(request, "api_doc_page.html")
+        return render(request, "api_doc_page.html", {"domain": domain})

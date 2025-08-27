@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     syncColorInputs(qrColor, qrColorText);
-    syncColorInputs(qrBgColor, qrBgColorText);
     syncColorInputs(gradientStart, gradientStartText);
     syncColorInputs(gradientEnd, gradientEndText);
 
