@@ -152,13 +152,15 @@
                                 <img src="{{ image_url }}" alt="qrcode">
                             </div>
                             <div class="download-options">
-                                <a href="{{ image_url }}" class="btn btn-outline" id="downloadPNG" download>Download PNG</a>
+                                <a href="{{ image_url }}" class="btn btn-outline" id="downloadPNG" download>Download
+                                    PNG</a>
                                 <a href="{% url 'qr-gen' %}" class="btn btn-outline">Generate Another</a>
                                 {% if not saved %}
-                                    <a href="{% url 'save-qrcode' %}?filename={{ filename }}&image_url={{ image_url }}" class="btn btn-outline">Save To Favorite</a>
+                                    <a href="{% url 'save-qrcode' %}?filename={{ filename }}&image_url={{ image_url }}"
+                                       class="btn btn-outline">Save To Favorite</a>
                                 {% else %}
                                     <a href="" class="btn btn-primary">QrCode Saved</a>
-                                {% endif %} 
+                                {% endif %}
                             </div>
                         </div>
                     {% endif %}

@@ -24,6 +24,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("qr_gen.urls")),
     path("accounts/", include("accounts.urls")),
+    path("api/", include("api.urls")),
 ]
 
 if settings.DEBUG:

@@ -31,7 +31,7 @@ from accounts.models import QrCodeModel
 
 
 class QrGenView(View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         # Query Params
         # ( For showing download box useing query params )
         created = request.GET.get("created")
@@ -110,7 +110,6 @@ class QrGenView(View):
         match color_type:
             case "solid":
                 style_data["color_mask"] = SolidFillColorMask(
-                    back_color=webcolors.hex_to_rgb(bg_color),
                     front_color=webcolors.hex_to_rgb(color),
                 )
             case "gradient":
@@ -208,7 +207,7 @@ class QrGenView(View):
 
 @method_decorator(login_required, name="dispatch")
 class SaveQRCodeView(View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         user = request.user
         # Get Data From Query Params
         filename = request.GET.get("filename")
@@ -240,3 +239,9 @@ class SaveQRCodeView(View):
         query_string = urlencode(params)
 
         return redirect(f"{base_url}?{query_string}")
+
+
+class ApiDocumentionView(View):
+    def get(self, request):
+
+        return render(request, "api_doc_page.html")

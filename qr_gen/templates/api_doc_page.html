@@ -1,0 +1,475 @@
+{% extends '_layout.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/api_doc_page.css' %}">
+{% endblock %}
+
+{% block content %}
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>QRGen API Documentation</h1>
+                <p>Generate and manage QR codes programmatically with our RESTful API. Create custom QR codes with
+                    various styles and options.</p>
+                <a href="#endpoints" class="btn btn-primary">View Endpoints</a>
+            </div>
+        </section>
+
+        <section class="docs">
+            <div class="container">
+                <div class="docs-container">
+                    <div class="docs-header">
+                        <h2>API Documentation</h2>
+                        <p>Base URL: <code>http://localhost:8000/</code></p>
+                    </div>
+
+                    <div id="authentication" class="endpoint">
+                        <h3>Authentication</h3>
+                        <p>All API requests require an <code>x-api-key</code> header for authentication. If you don't
+                            have your API key, please check user dashboard.</p>
+                        
+                        <p>Also, you can see our documentation on <a href="https://share.apidog.com/f461c568-8b5d-4f4b-b74b-13b15b27374a">ApiDog</a></p>
+                        
+                    </div>
+
+                    <div id="endpoints">
+                        <h3>Endpoints</h3>
+
+                        <div class="endpoint">
+                            <div class="endpoint-header">
+                                <span class="method method-get">GET</span>
+                                <span class="endpoint-url">/api/get-qrcode/{qrcode_id}</span>
+                            </div>
+                            <div class="endpoint-description">
+                                <p>Retrieve a previously generated QR code by its ID.</p>
+                            </div>
+
+                            <h4>Parameters</h4>
+                            <table class="params-table">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Location</th>
+                                    <th>Type</th>
+                                    <th>Required</th>
+                                    <th>Description</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>qrcode_id</td>
+                                    <td>path</td>
+                                    <td>string</td>
+                                    <td>yes</td>
+                                    <td>The ID of the QR code to retrieve</td>
+                                </tr>
+                                <tr>
+                                    <td>x-api-key</td>
+                                    <td>header</td>
+                                    <td>string</td>
+                                    <td>Yes</td>
+                                    <td>Your API key for authentication</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <h4>Response Examples</h4>
+                            <div class="code-block">
+                                <div class="code-tabs">
+                                    <div class="code-tab active">200 Response</div>
+                                </div>
+                                <pre><code class="hljs json">{
+  "result": true,
+  "message": "Successfully retrieved QrCode",
+  "data": {
+    "download_url": "http://localhost:8000/media/qr_codes/qr_ab272525bd5d4bc9a4cc6e746888f6fe.png",
+    "qr_code_id": 20
+  }
+}</code></pre>
+                            </div>
+
+                            <div class="code-block">
+                                <div class="code-tabs">
+                                    <div class="code-tab active">401 Response</div>
+                                </div>
+                                <pre><code class="hljs json">{
+  "result": false,
+  "message": "Invalid API_Key"
+}</code></pre>
+                            </div>
+
+                            <div class="response-schema">
+                                <h4>Response Schema (200)</h4>
+                                <table class="schema-table">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Required</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>result</td>
+                                        <td>boolean</td>
+                                        <td>true</td>
+                                        <td>Indicates if the request was successful</td>
+                                    </tr>
+                                    <tr>
+                                        <td>message</td>
+                                        <td>string</td>
+                                        <td>true</td>
+                                        <td>Response message</td>
+                                    </tr>
+                                    <tr>
+                                        <td>data</td>
+                                        <td>object</td>
+                                        <td>true</td>
+                                        <td>Response data</td>
+                                    </tr>
+                                    <tr>
+                                        <td>data.download_url</td>
+                                        <td>string</td>
+                                        <td>false</td>
+                                        <td>URL to download the QR code image</td>
+                                    </tr>
+                                    <tr>
+                                        <td>data.qr_code_id</td>
+                                        <td>integer</td>
+                                        <td>false</td>
+                                        <td>ID of the QR code</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="endpoint">
+                            <div class="endpoint-header">
+                                <span class="method method-post">POST</span>
+                                <span class="endpoint-url">/api/create-qrcode/</span>
+                            </div>
+                            <div class="endpoint-description">
+                                <p>Create a new QR code with custom styling options.</p>
+                            </div>
+
+                            <h4>Parameters</h4>
+                            <table class="params-table">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Location</th>
+                                    <th>Type</th>
+                                    <th>Required</th>
+                                    <th>Description</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>x-api-key</td>
+                                    <td>header</td>
+                                    <td>string</td>
+                                    <td>Yes</td>
+                                    <td>Your API key for authentication</td>
+                                </tr>
+                                <tr>
+                                    <td>url</td>
+                                    <td>body</td>
+                                    <td>string</td>
+                                    <td>yes</td>
+                                    <td>The URL to encode in the QR code</td>
+                                </tr>
+                                <tr>
+                                    <td>size</td>
+                                    <td>body</td>
+                                    <td>integer</td>
+                                    <td>yes</td>
+                                    <td>Size of the QR code (Choice Field)</td>
+                                </tr>
+                                <tr>
+                                    <td>error_correction</td>
+                                    <td>body</td>
+                                    <td>string</td>
+                                    <td>yes</td>
+                                    <td>Error correction level (Choice Field)</td>
+                                </tr>
+                                <tr>
+                                    <td>style</td>
+                                    <td>body</td>
+                                    <td>string</td>
+                                    <td>yes</td>
+                                    <td>QR code style (Choice Field)</td>
+                                </tr>
+                                <tr>
+                                    <td>color_type</td>
+                                    <td>body</td>
+                                    <td>string</td>
+                                    <td>yes</td>
+                                    <td>Color type (Choice Field)</td>
+                                </tr>
+                                <tr>
+                                    <td>solid_color</td>
+                                    <td>body</td>
+                                    <td>string</td>
+                                    <td>no</td>
+                                    <td>Must be a hex code</td>
+                                </tr>
+                                <tr>
+                                    <td>gradient_start_color</td>
+                                    <td>body</td>
+                                    <td>string</td>
+                                    <td>no</td>
+                                    <td>Must be a hex code</td>
+                                </tr>
+                                <tr>
+                                    <td>gradient_end_color</td>
+                                    <td>body</td>
+                                    <td>string</td>
+                                    <td>no</td>
+                                    <td>Must be a hex code</td>
+                                </tr>
+                                <tr>
+                                    <td>gradient_bg_color</td>
+                                    <td>body</td>
+                                    <td>string</td>
+                                    <td>no</td>
+                                    <td>Must be a hex code</td>
+                                </tr>
+                                <tr>
+                                    <td>gradient_direction</td>
+                                    <td>body</td>
+                                    <td>string</td>
+                                    <td>no</td>
+                                    <td>Gradient direction (Choice Field)</td>
+                                </tr>
+                                <tr>
+                                    <td>saved</td>
+                                    <td>body</td>
+                                    <td>boolean</td>
+                                    <td>yes</td>
+                                    <td>Whether to save the QR code</td>
+                                </tr>
+                                <tr>
+                                    <td>logo</td>
+                                    <td>body</td>
+                                    <td>string(binary)</td>
+                                    <td>no</td>
+                                    <td>Logo image (Better be a PNG)</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <h4>Request Example</h4>
+                            <div class="code-block">
+                                <div class="code-tabs">
+                                    <div class="code-tab active">Choices Example</div>
+                                </div>
+                                <pre>
+                                    <code class="hljs bash">
+    "size": 10 or 20 or 30,
+    "error_correction": "ERROR_CORRECT_L" or "ERROR_CORRECT_M" or "ERROR_CORRECT_Q" or "ERROR_CORRECT_H",
+    "style": "classic" or "gapped" or "circle" or "rounded" or "vertical" or "horizontal",
+    "color_type": "solid" or "gradient",
+    "gradient_direction": "radial" or "square" or "horizontal" or "vertical",
+                                    </code>
+                                </pre>
+                            </div>
+
+                            <h4>Response Examples</h4>
+                            <div class="code-block">
+                                <div class="code-tabs">
+                                    <div class="code-tab active">200 Response</div>
+                                </div>
+                                <pre><code class="hljs json">{
+  "result": true,
+  "massage": "QrCode Created",
+  "data": [
+    {
+      "download_url": "http://localhost:8000/media/qr_codes/qr_1db6ceccfb1048a689d5b43a8a05ef4c.png",
+      "qr_code_id": 21
+    }
+  ]
+}</code></pre>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-tabs">
+                                    <div class="code-tab active">401 Response</div>
+                                </div>
+                                <pre><code class="hljs json">{
+  "result": false,
+  "message": "Invalid API_Key"
+}</code></pre>
+                            </div>
+
+                            <div class="response-schema">
+                                <h4>Response Schema (200)</h4>
+                                <table class="schema-table">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Required</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>result</td>
+                                        <td>boolean</td>
+                                        <td>true</td>
+                                        <td>Indicates if the request was successful</td>
+                                    </tr>
+                                    <tr>
+                                        <td>massage</td>
+                                        <td>string</td>
+                                        <td>true</td>
+                                        <td>Response message</td>
+                                    </tr>
+                                    <tr>
+                                        <td>data</td>
+                                        <td>array</td>
+                                        <td>true</td>
+                                        <td>Response data</td>
+                                    </tr>
+                                    <tr>
+                                        <td>data[].download_url</td>
+                                        <td>string</td>
+                                        <td>false</td>
+                                        <td>URL to download the QR code image</td>
+                                    </tr>
+                                    <tr>
+                                        <td>data[].qr_code_id</td>
+                                        <td>integer</td>
+                                        <td>false</td>
+                                        <td>ID of the QR code</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="endpoint">
+                            <div class="endpoint-header">
+                                <span class="method method-get">GET</span>
+                                <span class="endpoint-url">/api/user-qrcodes/</span>
+                            </div>
+                            <div class="endpoint-description">
+                                <p>Retrieve all QR codes generated by the authenticated user.</p>
+                            </div>
+
+                            <h4>Parameters</h4>
+                            <table class="params-table">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Location</th>
+                                    <th>Type</th>
+                                    <th>Required</th>
+                                    <th>Description</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>x-api-key</td>
+                                    <td>header</td>
+                                    <td>string</td>
+                                    <td>Yes</td>
+                                    <td>Your API key for authentication</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <h4>Response Examples</h4>
+                            <div class="code-block">
+                                <div class="code-tabs">
+                                    <div class="code-tab active">200 Response</div>
+                                </div>
+                                <pre><code class="hljs json">{
+  "result": true,
+  "message": "Successfully retrieved QrCodes",
+  "data": [
+    {
+      "download_url": "http://localhost:8000/media/qr_codes/qr_1353d5243e4947e6b642836adf6ae5fd.png",
+      "qr_code_id": 11
+    },
+    {
+      "download_url": "http://localhost:8000/media/qr_codes/qr_58365f607aca4f1f9dd46395f69a554d.png",
+      "qr_code_id": 12
+    },
+    {
+      "download_url": "http://localhost:8000/media/qr_codes/qr_b18e98ad553449ad971dd511b166464d.png",
+      "qr_code_id": 13
+    }
+  ]
+}</code></pre>
+                            </div>
+                            
+                            <div class="code-block">
+                                <div class="code-tabs">
+                                    <div class="code-tab active">401 Response</div>
+                                </div>
+                                <pre><code class="hljs json">{
+  "result": false,
+  "message": "Invalid API_Key"
+}</code></pre>
+                            </div>
+
+                            <div class="response-schema">
+                                <h4>Response Schema (200)</h4>
+                                <table class="schema-table">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Required</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>result</td>
+                                        <td>boolean</td>
+                                        <td>true</td>
+                                        <td>Indicates if the request was successful</td>
+                                    </tr>
+                                    <tr>
+                                        <td>message</td>
+                                        <td>string</td>
+                                        <td>true</td>
+                                        <td>Response message</td>
+                                    </tr>
+                                    <tr>
+                                        <td>data</td>
+                                        <td>array</td>
+                                        <td>true</td>
+                                        <td>Array of QR code objects</td>
+                                    </tr>
+                                    <tr>
+                                        <td>data[].download_url</td>
+                                        <td>string</td>
+                                        <td>true</td>
+                                        <td>URL to download the QR code image</td>
+                                    </tr>
+                                    <tr>
+                                        <td>data[].qr_code_id</td>
+                                        <td>integer</td>
+                                        <td>true</td>
+                                        <td>ID of the QR code</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/api_doc_page.js' %}"></script>
+{% endblock %}

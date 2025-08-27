@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "django_render_partial",
     "qr_gen",
     "accounts",
+    "api",
 ]
 
 MIDDLEWARE = [

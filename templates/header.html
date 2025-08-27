@@ -10,7 +10,7 @@
                 {% if request.user.is_authenticated %}
                     <a href="{% url 'dashboard' %}">Dashboard</a>
                 {% endif %}
-                <a href="#pricing">Api Documentation</a>
+                <a href="{% url 'api-doc' %}">Api Documentation</a>
             </div>
             {% if not request.user.is_authenticated %}
                 <a href="{% url 'register' %}" class="btn btn-outline">Login / SingUp</a>
