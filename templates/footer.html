@@ -14,7 +14,7 @@
                 <ul class="footer-links">
                     <li><a href="{% url 'qr-gen' %}">Home</a></li>
                     {% if request.user.is_authenticated %}
-                        <li><a href="{% url 'dashbored' %}">Dashbored</a></li>
+                        <li><a href="{% url 'dashboard' %}">Dashbored</a></li>
                     {% endif %}
                     <li><a href="{% url 'api-doc' %}">Api Documentation</a></li>
                     <li><a href="{% url 'register' %}">Login & SingUp</a></li>
@@ -24,7 +24,7 @@
             <div class="footer-column"></div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2023 QRGen Pro. All rights reserved.</p>
+            <p>&copy; 2023 QRGen Pro. All rights reserved. <a href="https://github.com/MohsenSangSefidi">Mohsen Sane Sefidi</a></p>
         </div>
     </div>
 </footer>

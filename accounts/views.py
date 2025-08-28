@@ -7,6 +7,7 @@ from utils.email_utils import send_email
 from urllib.parse import urlencode
 from django.utils import timezone
 from django.conf import settings
+from datetime import timedelta
 from django.views import View
 
 from .forms import (
@@ -305,7 +306,7 @@ class SendEmailView(View):
 
         # Set A New Token For User
         user.token = get_random_string(length=100)
-        user.token_active_date = timezone.datetime.now() + timezone.timedelta(days=1)
+        user.token_active_date = timezone.now() + timedelta(days=1)
         user.save()
 
         # Send mail
